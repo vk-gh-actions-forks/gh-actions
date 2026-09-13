@@ -1,6 +1,7 @@
 # terraform-docs GitHub Actions
 
-A Github action for generating Terraform module documentation using terraform-docs and gomplate.
+Generate Terraform module documentation in pull requests.
+
 In addition to statically defined directory modules, this module can search specific
 subfolders or parse `atlantis.yaml` for module identification and doc generation. This
 action has the ability to auto commit docs to an open PR or after a push to a specific
@@ -8,7 +9,7 @@ branch.
 
 ## Version
 
-`v1.0.0` (uses [terraform-docs] v0.16.0, which is supported and tested on Terraform
+`v1.4.1` (uses [terraform-docs] v0.20.0, which is supported and tested on Terraform
 version 0.11+ and 0.12+ but may work for others.)
 
 ### Upgrade v0 to v1
@@ -42,7 +43,7 @@ jobs:
         ref: ${{ github.event.pull_request.head.ref }}
 
     - name: Render terraform docs inside the README.md and push changes back to PR branch
-      uses: terraform-docs/gh-actions@v1.0.0
+      uses: terraform-docs/gh-actions@v1.4.1
       with:
         working-dir: .
         output-file: README.md
@@ -72,13 +73,14 @@ jobs:
 | git-push-sign-off | If true it will sign-off commit | `false` | false |
 | git-push-user-email | If empty the no-reply email of the GitHub Actions bot will be used (i.e. `github-actions[bot]@users.noreply.github.com`) | `""` | false |
 | git-push-user-name | If empty the name of the GitHub Actions bot will be used (i.e. `github-actions[bot]`) | `""` | false |
+| git-sub-dir | Subdirectory that terraform code is checked out into | `""` | false |
 | indention | Indention level of Markdown sections [1, 2, 3, 4, 5] | `2` | false |
 | output-file | File in module directory where the docs should be placed | `README.md` | false |
 | output-format | terraform-docs format to generate content (see [all formats](https://github.com/terraform-docs/terraform-docs/blob/master/docs/FORMATS\_GUIDE.md)) (ignored if `config-file` is set) | `markdown table` | false |
-| output-method | Method should be one of `replace`, `inject`, or `print` | `inject` | false |
+| output-method | Method should be one of `replace`, `inject`, or `print`. Set as an empty string if `output.mode` and `output.file` are defined in config-file | `inject` | false |
 | recursive | If true it will update submodules recursively | `false` | false |
 | recursive-path | Submodules path to recursively update | `modules` | false |
-| template | When provided will be used as the template if/when the `output-file` does not exist | `<!-- BEGIN_TF_DOCS -->\n{{ .Content }}\n<!-- END_TF_DOCS -->` | false |
+| template | When provided will be used as the template if/when the `output-file` does not exist. Set as an empty string if `output.template` is defined in config-file | `<!-- BEGIN_TF_DOCS -->\n{{ .Content }}\n<!-- END_TF_DOCS -->` | false |
 | working-dir | Comma separated list of directories to generate docs for (ignored if `atlantis-file` or `find-dir` is set) | `.` | false |
 
 #### Output Method (output-method)
@@ -147,7 +149,7 @@ To enable you need to ensure a few things first:
 
 ```yaml
 - name: Generate TF Docs
-  uses: terraform-docs/gh-actions@v1.0.0
+  uses: terraform-docs/gh-actions@v1.4.1
   with:
     working-dir: .
 ```
@@ -156,7 +158,7 @@ To enable you need to ensure a few things first:
 
 ```yaml
 - name: Generate TF Docs
-  uses: terraform-docs/gh-actions@v1.0.0
+  uses: terraform-docs/gh-actions@v1.4.1
   with:
     working-dir: .,example1,example3/modules/test
 ```
@@ -165,7 +167,7 @@ To enable you need to ensure a few things first:
 
 ```yaml
 - name: Generate TF docs
-  uses: terraform-docs/gh-actions@v1.0.0
+  uses: terraform-docs/gh-actions@v1.4.1
   with:
     atlantis-file: atlantis.yaml
 ```
@@ -174,7 +176,7 @@ To enable you need to ensure a few things first:
 
 ```yaml
 - name: Generate TF docs
-  uses: terraform-docs/gh-actions@v1.0.0
+  uses: terraform-docs/gh-actions@v1.4.1
   with:
     find-dir: examples/
 ```
@@ -183,13 +185,13 @@ To enable you need to ensure a few things first:
 
 ```yaml
 - name: Generate TF docs
-  uses: terraform-docs/gh-actions@v1.0.0
+  uses: terraform-docs/gh-actions@v1.4.1
   with:
     working-dir: examples/
     recursive: true
     recursive-path: modules
 ```
 
-Complete examples can be found [here](https://github.com/terraform-docs/gh-actions/tree/v1.0.0/examples).
+Complete examples can be found [here](https://github.com/terraform-docs/gh-actions/tree/v1.4.1/examples).
 
 [terraform-docs]: https://github.com/terraform-docs/terraform-docs

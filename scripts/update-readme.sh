@@ -19,19 +19,31 @@ set -o pipefail
 set -o errtrace
 
 NEW_VERSION=$1
+TF_DOCS_VERSION=$2
 
 PWD=$(cd "$(dirname "$0")" && pwd -P)
 
 if [ -z "${NEW_VERSION}" ]; then
     NEW_VERSION=$(grep "uses: terraform-docs/gh-actions" "${PWD}"/../README.md | tr -s ' ' | uniq | cut -d"@" -f2)
 fi
-
 if [ -z "${NEW_VERSION}" ]; then
-    echo "Must have version like: v1.0.1"
+    echo "Usage: update-readme.sh <NEW_VERSION> <TF_DOCS_VERSION>"
+    exit 1
+fi
+
+if [ -z "${TF_DOCS_VERSION}" ]; then
+    TF_DOCS_VERSION=$(grep "FROM quay.io/terraform-docs/terraform-docs" "${PWD}"/../Dockerfile | tr -s ' ' | uniq | cut -d":" -f2)
+fi
+if [ -z "${TF_DOCS_VERSION}" ]; then
+    echo "Usage: update-readme.sh <NEW_VERSION> <TF_DOCS_VERSION>"
     exit 1
 fi
 
 # Update the README
-VERSION=${NEW_VERSION} gomplate -d action="${PWD}"/../action.yml -f "${PWD}"/../.github/templates/README.tpl -o "${PWD}"/../README.md
+VERSION=v${NEW_VERSION//v/} TERRAFORM_DOCS_VERSION=v${TF_DOCS_VERSION//v/} \
+    gomplate -d \
+    action="${PWD}"/../action.yml \
+    -f "${PWD}"/../.github/templates/README.tpl \
+    -o "${PWD}"/../README.md
 
 echo "README.md updated."
